@@ -7,9 +7,11 @@
   > Release:        20.04
   > Codename:       focal
 
-* 版本控制 git
 
-* 
+
+### 版本控制（git）
+
+* start  建立项目
 
 
 
