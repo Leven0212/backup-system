@@ -1,5 +1,5 @@
 #include <stdio.h>
 
-#define ARGC_FALL 1
+#define ARGC_ERROR 1
 
 void errorhanding(int errorcode);
