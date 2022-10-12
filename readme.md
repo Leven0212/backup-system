@@ -11,6 +11,9 @@
 
 ### 版本控制（git）
 
+* 指令集
+  * git push -u origin master （建立项目并上传）
+
 * start  建立项目
 
 
