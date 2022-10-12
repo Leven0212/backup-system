@@ -1,7 +1,8 @@
-//#include <fstream>
+#include <fstream>
 #include <AES.h>
-typedef bitset<8> byte;
-typedef bitset<32> word;
+using namespace std;
+#define byte bitset<8>
+#define word bitset<32>
 /**
  *  将一个char字符数组转化为二进制
  *  存到一个 byte 数组中
@@ -43,7 +44,7 @@ bitset<128> mergeByte(byte in[16])
 	return res;
 }
 
-bool Encrypt(string src, string key)
+bool Encrypt(string src, string keyStr)
 {
 	string tar = src;
 	byte key[16]; 
@@ -73,7 +74,7 @@ bool Encrypt(string src, string key)
 	return true;
 }
 
-bool Decrypt(string src, string key)
+bool Decrypt(string src, string keyStr)
 {
 	string tar = src;
 	byte key[16]; 

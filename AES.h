@@ -7,8 +7,8 @@
 #include <bitset>
 #include <string>
 using namespace std; 
-typedef bitset<8> byte;
-typedef bitset<32> word;
+#define byte bitset<8>
+#define word bitset<32>
 
 const int Nr = 10;  // AES-128需要 10 轮加密
 const int Nk = 4;   // Nk 表示输入密钥的 word 个数
@@ -314,8 +314,10 @@ void KeyExpansion(byte key[4*Nk], word w[4*(Nr+1)])
 	while(i < 4*(Nr+1))
 	{
 		temp = w[i-1]; // 记录前一个word
-		if(i % Nk == 0)
-			w[i] = w[i-Nk] ^ SubWord(RotWord(temp)) ^ Rcon[i/Nk-1];
+		if(i % Nk == 0){
+			word t = RotWord(temp);
+			w[i] = w[i-Nk] ^ SubWord(t) ^ Rcon[i/Nk-1];
+		}
 		else 
 			w[i] = w[i-Nk] ^ temp;
 		++i;
