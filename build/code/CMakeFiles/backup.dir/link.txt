@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/backup.dir/main.cc.o CMakeFiles/backup.dir/error.cc.o CMakeFiles/backup.dir/basefunction.cc.o  -o backup 

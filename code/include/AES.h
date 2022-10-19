@@ -6,9 +6,8 @@
 #include <iostream>
 #include <bitset>
 #include <string>
-using namespace std; 
-#define byte bitset<8>
-#define word bitset<32>
+#define byte std::bitset<8>
+#define word std::bitset<32>
 
 const int Nr = 10;  // AES-128需要 10 轮加密
 const int Nk = 4;   // Nk 表示输入密钥的 word 个数
