@@ -51,12 +51,79 @@ void produce(char *path, int mode, char *key) {
 
     else if (mode == CHECK) {
         operate_check = true;
-        if (operate_check == false)
-            errorhanding(CHECK_FAIL);
+        filetree *root = new filetree(path);
+        build(root);
+        std::vector<int> p1 = getChecksumfromTree(root);
+        std::vector<int> p2 = getChecksumfromFile(aimfile);
+        bool legal = compare(p1, p2);
+        if (!legal)
+            std::cout << "There is a backup problem!\n";
+        else
+            std::cout << "Backup succeeded!\n";
+
     } else {
         // operate error
         errorhanding(ARGC_ERROR_OPERATE);
     }
+}
+
+std::vector<int> getChecksumfromTree(filetree *root) {
+    std::vector<int> res;
+    res.clear();
+    res.push_back(root->checksum);
+    for (auto i : root->son) {
+        std::vector<int> temp = getChecksumfromTree(i);
+        for (auto j : temp)
+            res.push_back(j);
+    }
+    return res;
+}
+
+std::vector<int> getChecksumfromFile(std::string name) {
+    std::vector<int> res;
+    res.clear();
+
+    int tot;
+    std::ifstream is;
+    is.open(name, std::ios::in | std::ios::binary);
+    if (!is.is_open())
+        errorhanding(FILE_OPEN_FAIL);
+    is >> tot;
+
+    for (int i = 0; i < tot; i++) {
+
+        filetree *nowfile = new filetree();
+        is >> nowfile->path >> nowfile->filebuff.st_mode >>
+            nowfile->filebuff.st_size >> nowfile->filebuff.st_uid;
+        is >> nowfile->filebuff.st_atim.tv_sec >>
+            nowfile->filebuff.st_atim.tv_nsec >>
+            nowfile->filebuff.st_mtim.tv_sec >>
+            nowfile->filebuff.st_mtim.tv_nsec >>
+            nowfile->filebuff.st_ctim.tv_sec >>
+            nowfile->filebuff.st_ctim.tv_nsec >> nowfile->filebuff.st_uid >>
+            nowfile->filebuff.st_gid;
+        is >> nowfile->checksum >> nowfile->sonnum >> nowfile->linenum;
+
+        if (!isDirectory(nowfile->filebuff.st_mode)) {
+            std::string s;
+            getline(is, s);
+            for (int i = 0; i < nowfile->linenum; i++)
+                getline(is, s);
+        }
+
+        res.push_back(nowfile->checksum);
+    }
+    is.close();
+    return res;
+}
+bool compare(std::vector<int> x, std::vector<int> y) {
+    if (x.size() != y.size())
+        return 0;
+    for (int i = 0; i < x.size(); i++) {
+        if (x[i] != y[i])
+            return 0;
+    }
+    return 1;
 }
 
 int deletefile(std::string path) {
