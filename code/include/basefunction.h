@@ -36,7 +36,13 @@ struct filetree {
     int totfile;
     int linenum;
     std::vector<filetree *> son; // the sons of current node
-
+    filetree() {
+        path = "";
+        checksum = 0;
+        sonnum = 0;
+        totfile = 0;
+        linenum = 0;
+    }
     filetree(std::string path_) : path(path_) {
         bool getfile = stat(path.c_str(), &filebuff);
         if (getfile == -1)
@@ -70,7 +76,8 @@ struct filetree {
            << filebuff.st_uid << " ";
         os << filebuff.st_atim.tv_sec << " " << filebuff.st_atim.tv_nsec << " "
            << filebuff.st_mtim.tv_sec << " " << filebuff.st_mtim.tv_nsec << " "
-           << filebuff.st_ctim.tv_sec << " " << filebuff.st_ctim.tv_nsec << " ";
+           << filebuff.st_ctim.tv_sec << " " << filebuff.st_ctim.tv_nsec << " "
+           << filebuff.st_uid << " " << filebuff.st_gid << " ";
         os << checksum << " " << sonnum << " " << linenum << std::endl;
         os << data;
         os.close();

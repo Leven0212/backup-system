@@ -15,5 +15,6 @@
 
 #define GET_FILE_FAIL 10
 #define DELETE_FAIL 11
+#define UPDATE_FAIL 12
 
 void errorhanding(int errorcode);

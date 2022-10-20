@@ -1,6 +1,8 @@
 #include "basefunction.h"
 #include "error.h"
 #include <stack>
+#include <sys/time.h>
+#include <utime.h>
 
 bool isDirectory(mode_t mode) { return (S_ISDIR(mode)); }
 
@@ -186,32 +188,29 @@ std::vector<filetree *> readdata(std::string name) {
     std::vector<filetree *> res;
     is >> tot;
 
-    std::string path;
-    mode_t temp;
     for (int i = 0; i < tot; i++) {
-        is >> path >> temp;
-        std::ofstream os;
-        if (isDirectory(temp)) {
-            if (access(path.c_str(), F_OK) == -1) {
-                int isCreateFolder = mkdir(path.c_str(), S_IRWXU);
-                if (isCreateFolder == -1)
-                    errorhanding(FOLDER_CREATE_FOLDER);
-            }
-        } else
-            os.open(path, std::ios::out | std::ios::binary);
 
-        filetree *nowfile = new filetree(path);
-        nowfile->filebuff.st_mode = temp;
-        is >> nowfile->filebuff.st_size >> nowfile->filebuff.st_uid;
+        filetree *nowfile = new filetree();
+        is >> nowfile->path >> nowfile->filebuff.st_mode >>
+            nowfile->filebuff.st_size >> nowfile->filebuff.st_uid;
         is >> nowfile->filebuff.st_atim.tv_sec >>
             nowfile->filebuff.st_atim.tv_nsec >>
             nowfile->filebuff.st_mtim.tv_sec >>
             nowfile->filebuff.st_mtim.tv_nsec >>
             nowfile->filebuff.st_ctim.tv_sec >>
-            nowfile->filebuff.st_ctim.tv_nsec;
+            nowfile->filebuff.st_ctim.tv_nsec >> nowfile->filebuff.st_uid >>
+            nowfile->filebuff.st_gid;
         is >> nowfile->checksum >> nowfile->sonnum >> nowfile->linenum;
 
-        if (!isDirectory(nowfile->filebuff.st_mode)) {
+        std::ofstream os;
+        if (isDirectory(nowfile->filebuff.st_mode)) {
+            if (access(nowfile->path.c_str(), F_OK) == -1) {
+                int isCreateFolder = mkdir(nowfile->path.c_str(), S_IRWXU);
+                if (isCreateFolder == -1)
+                    errorhanding(FOLDER_CREATE_FOLDER);
+            }
+        } else {
+            os.open(nowfile->path, std::ios::out | std::ios::binary);
             std::string s;
             getline(is, s);
             for (int i = 0; i < nowfile->linenum; i++) {
@@ -220,7 +219,17 @@ std::vector<filetree *> readdata(std::string name) {
             }
             os.close();
         }
-
+        // update the Attributes of file or dir
+        struct utimbuf timebuf;
+        timebuf.actime = nowfile->filebuff.st_atim.tv_sec;
+        timebuf.modtime = nowfile->filebuff.st_mtim.tv_sec;
+        int change = 0;
+        change += chmod(nowfile->path.c_str(), nowfile->filebuff.st_mode);
+        change += chown(nowfile->path.c_str(), nowfile->filebuff.st_uid,
+                        nowfile->filebuff.st_gid);
+        change += utime(nowfile->path.c_str(), &timebuf);
+        if (change < 0)
+            errorhanding(UPDATE_FAIL);
         res.push_back(nowfile);
     }
     is.close();
