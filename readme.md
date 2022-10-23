@@ -28,7 +28,7 @@
 * start  建立项目
   * `start-0x`  建立项目，完成基础功能
   * `start-1.x` 基础功能实现
-  * `start-2.x` 额外功能
+  * `start-2.x` 
     * `start-2.1` 实现加密解密，加密文件后缀为`.cpt`的二进制文件
 
 ### 程序使用
@@ -37,10 +37,12 @@
 * `cmake ..`
 * `make`
 * `cd ..`
-* `./build/code/backup [path] [0 backup/1 recover/2 check] [key]   (注意必须使用绝对路径)`
+* `./build/code/backup [path] [0 backup/1 recover/2 check] [key] `
+  * 注意必须使用绝对路径
+  * 密码长度任意，但有效长度为16位
 
 ### To Do
-* 加密
+* 加密目前问题：错误密码导致程序崩溃
 
 
 ### docker

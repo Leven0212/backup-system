@@ -22,6 +22,7 @@
 #define CHECK 2
 
 #define KEY "0000000000000000"
+#define CEN_LEN 16
 
 bool isDirectory(mode_t mode);
 
