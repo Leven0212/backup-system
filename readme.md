@@ -28,7 +28,8 @@
 * start  建立项目
   * `start-0x`  建立项目，完成基础功能
   * `start-1.x` 基础功能实现
-  * `start-2.x`  to do
+  * `start-2.x` 额外功能
+    * `start-2.1` 实现加密解密，加密文件后缀为`.cpt`的二进制文件
 
 ### 程序使用
 * `mkdir build`

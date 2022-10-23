@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
     // argc[1]  operate backup(0) or recover(1)
 
     // 遍历文件树
-    char *key = NULL;
+    std::string key = KEY;
     if (argc > 3)
         key = argv[3];
     int operator_num = atoi(argv[2]);

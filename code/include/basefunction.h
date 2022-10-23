@@ -21,12 +21,14 @@
 #define RECOVER 1
 #define CHECK 2
 
+#define KEY "0000000000000000"
+
 bool isDirectory(mode_t mode);
 
-int hash(char *path);                          // get a hash number of the path
-int filetype(char *path);                      // return the type of a file
-void produce(char *path, int mode, char *key); // operate the file
-int getChecksum(const char *path);             // get the checksum of the file
+int hash(char *path);     // get a hash number of the path
+int filetype(char *path); // return the type of a file
+void produce(char *path, int mode, std::string key); // operate the file
+int getChecksum(const char *path); // get the checksum of the file
 
 struct filetree {
     std::string path;     // the path of the file or directory

@@ -1,5 +1,6 @@
 #include <fstream>
 #include "AES.h"
+#include <unistd.h>
 
 /**
  *  将一个char字符数组转化为二进制
@@ -27,7 +28,7 @@ void divideToByte(byte out[16], std::bitset<128> &data) {
  */
 std::bitset<128> mergeByte(byte in[16]) {
     std::bitset<128> res;
-    res.reset(); // 置0
+    res.reset();
     std::bitset<128> temp;
     for (int i = 0; i < 16; ++i) {
         temp = in[i].to_ulong();
@@ -38,16 +39,16 @@ std::bitset<128> mergeByte(byte in[16]) {
 }
 
 bool Encrypt(std::string src, std::string keyStr) {
-    std::string tar = src;
+    std::string tar = src + ".cpt";
     byte key[16];
     charToByte(key, keyStr.c_str());
-    // 密钥扩展
+
     word w[4 * (Nr + 1)];
     KeyExpansion(key, w);
 
     std::bitset<128> data;
     byte plain[16];
-    // 将文件 flower.jpg 加密到 cipher.txt 中
+
     std::ifstream in;
     std::ofstream out;
 
@@ -58,7 +59,7 @@ bool Encrypt(std::string src, std::string keyStr) {
         encrypt(plain, w);
         data = mergeByte(plain);
         out.write((char *)&data, sizeof(data));
-        data.reset(); // 置0
+        data.reset();
     }
     in.close();
     out.close();
@@ -67,20 +68,21 @@ bool Encrypt(std::string src, std::string keyStr) {
 
 bool Decrypt(std::string src, std::string keyStr) {
     std::string tar = src;
+    src = src + ".cpt";
     byte key[16];
     charToByte(key, keyStr.c_str());
-    // 密钥扩展
+
     word w[4 * (Nr + 1)];
     KeyExpansion(key, w);
 
     std::bitset<128> data;
     byte plain[16];
-    // 将文件 flower.jpg 加密到 cipher.txt 中
+
     std::ifstream in;
     std::ofstream out;
 
-    in.open("D://cipher.txt", std::ios::binary);
-    out.open("D://flower1.jpg", std::ios::binary);
+    in.open(src, std::ios::binary);
+    out.open(tar, std::ios::binary);
     while (in.read((char *)&data, sizeof(data))) {
         divideToByte(plain, data);
         decrypt(plain, w);
@@ -90,4 +92,5 @@ bool Decrypt(std::string src, std::string keyStr) {
     }
     in.close();
     out.close();
+    return true;
 }

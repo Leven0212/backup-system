@@ -3,6 +3,7 @@
 #include <stack>
 #include <sys/time.h>
 #include <utime.h>
+#include "encrypt_and_decrypt.h"
 
 bool isDirectory(mode_t mode) { return (S_ISDIR(mode)); }
 
@@ -14,7 +15,7 @@ int hash(char *path) {
     return tot;
 }
 
-void produce(char *path, int mode, char *key) {
+void produce(char *path, int mode, std::string key) {
 
     std::string pwd = getcwd(NULL, 0);
     std::string aimfolder = pwd + "/backup/";
@@ -40,17 +41,23 @@ void produce(char *path, int mode, char *key) {
         operate_check = root->backup(aimfile);
         if (operate_check == false)
             errorhanding(BACKUP_FAIL);
+        Encrypt(aimfile, key);
+        unlink(aimfile.c_str());
+
     } else if (mode == RECOVER) {
         int deletacc = deletefile(path);
         /*if (deletacc == -1)
             errorhanding(DELETE_FAIL);*/
+        Decrypt(aimfile, key);
         operate_check = recover(aimfile);
         if (operate_check == false)
             errorhanding(RECOVER_FAIL);
+        unlink(aimfile.c_str());
     }
 
     else if (mode == CHECK) {
         operate_check = true;
+        Decrypt(aimfile, key);
         filetree *root = new filetree(path);
         build(root);
         std::vector<int> p1 = getChecksumfromTree(root);
@@ -60,6 +67,7 @@ void produce(char *path, int mode, char *key) {
             std::cout << "There is a backup problem!\n";
         else
             std::cout << "Backup succeeded!\n";
+        unlink(aimfile.c_str());
 
     } else {
         // operate error
