@@ -17,4 +17,9 @@
 #define DELETE_FAIL 11
 #define UPDATE_FAIL 12
 
+#define LINK_FAIL 13
+#define LINK_CREATE_FAIL 14
+
+#define HARD_LINK_CREATE_FAIL 15
+
 void errorhanding(int errorcode);

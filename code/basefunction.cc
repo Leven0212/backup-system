@@ -5,7 +5,9 @@
 #include <utime.h>
 #include "encrypt_and_decrypt.h"
 
-bool isDirectory(mode_t mode) { return (S_ISDIR(mode)); }
+int isDir(mode_t mode) { return (S_ISDIR(mode)); }
+int isFIFO(mode_t mode) { return (S_ISFIFO(mode)); }
+int isLink(mode_t mode) { return (S_ISLNK(mode)); }
 
 int hash(char *path) {
     long long tot = 0;
@@ -31,6 +33,7 @@ void produce(char *path, int mode, std::string key) {
             errorhanding(FOLDER_CREATE_FOLDER);
     }
     bool operate_check = true;
+
     if (mode == BACKUP) {
         FILE *fd = fopen(aimfile.c_str(), "w+");
         if (fd == NULL)
@@ -38,6 +41,9 @@ void produce(char *path, int mode, std::string key) {
         fclose(fd);
         filetree *root = new filetree(path);
         build(root);
+
+        std::map<ino_t, std::string> hard;
+        hard.clear();
         operate_check = root->backup(aimfile);
         if (operate_check == false)
             errorhanding(BACKUP_FAIL);
@@ -112,7 +118,7 @@ std::vector<int> getChecksumfromFile(std::string name) {
             nowfile->filebuff.st_gid;
         is >> nowfile->checksum >> nowfile->sonnum >> nowfile->linenum;
 
-        if (!isDirectory(nowfile->filebuff.st_mode)) {
+        if (!isDir(nowfile->filebuff.st_mode)) {
             std::string s;
             getline(is, s);
             for (int i = 0; i < nowfile->linenum; i++)
@@ -182,7 +188,7 @@ int deletefile(std::string path) {
 
 int build(filetree *node) {
     int sum = 0;
-    if (isDirectory(node->filebuff.st_mode)) {
+    if (isDir(node->filebuff.st_mode)) {
 
         DIR *dir = opendir(node->path.c_str());
         if (dir == NULL)
@@ -207,8 +213,18 @@ int build(filetree *node) {
         return node->totfile = 1;
     }
 }
-int getChecksum(const char *path) {
+int getChecksum(const char *path, mode_t mode) {
+
     int checksum = 0;
+
+    // FIFO file or dir
+    if (isDir(mode) || isFIFO(mode) || isLink(mode)) {
+        char *temp = const_cast<char *>(path);
+        checksum = hash(temp);
+        return checksum;
+    }
+
+    // file
     std::ifstream os;
     os.open(path, std::ios::binary | std::ios::in);
     if (!os.is_open())
@@ -230,38 +246,45 @@ int getChecksum(const char *path) {
 }
 
 bool recover(std::string name) {
-    std::vector<filetree *> tot = readdata(name);
-    int now = 0;
-    filetree *root = tot[now++];
-    std::stack<std::pair<filetree *, int>> S;
-    while (!S.empty())
-        S.pop();
-    if (root->sonnum)
-        S.push(std::make_pair(root, root->sonnum));
-
-    while (!S.empty()) {
-        std::pair<filetree *, int> cur = S.top();
-        S.pop();
-        cur.second--;
-        filetree *p = tot[now++];
-        cur.first->son.push_back(p);
-        if (cur.second)
-            S.push(cur);
-        if (p->sonnum)
-            S.push(std::make_pair(p, p->sonnum));
-    }
+    readdata(name);
     return true;
 }
 
-std::vector<filetree *> readdata(std::string name) {
+void changeAttr(filetree *nowfile) {
+
+    int change = 0;
+    change += chmod(nowfile->path.c_str(), nowfile->filebuff.st_mode);
+    change += chown(nowfile->path.c_str(), nowfile->filebuff.st_uid,
+                    nowfile->filebuff.st_gid);
+
+    if (isLink(nowfile->filebuff.st_mode)) {
+        struct timeval time_buf[2];
+        time_buf[0].tv_sec = nowfile->filebuff.st_atim.tv_sec;
+        time_buf[0].tv_usec = nowfile->filebuff.st_atim.tv_nsec / 1000;
+        time_buf[1].tv_sec = nowfile->filebuff.st_mtim.tv_sec;
+        time_buf[1].tv_usec = nowfile->filebuff.st_mtim.tv_nsec / 1000;
+        change += lutimes(nowfile->path.c_str(), time_buf);
+    } else {
+        struct utimbuf timebuf;
+        timebuf.actime = nowfile->filebuff.st_atim.tv_sec;
+        timebuf.modtime = nowfile->filebuff.st_mtim.tv_sec;
+        change += utime(nowfile->path.c_str(), &timebuf);
+    }
+
+    if (change < 0)
+        errorhanding(UPDATE_FAIL);
+}
+
+void readdata(std::string name) {
 
     int tot;
     std::ifstream is;
     is.open(name, std::ios::in | std::ios::binary);
     if (!is.is_open())
         errorhanding(FILE_OPEN_FAIL);
-    std::vector<filetree *> res;
     is >> tot;
+
+    std::vector<std::pair<std::string, filetree *>> sy_link;
 
     for (int i = 0; i < tot; i++) {
 
@@ -275,38 +298,57 @@ std::vector<filetree *> readdata(std::string name) {
             nowfile->filebuff.st_ctim.tv_sec >>
             nowfile->filebuff.st_ctim.tv_nsec >> nowfile->filebuff.st_uid >>
             nowfile->filebuff.st_gid;
-        is >> nowfile->checksum >> nowfile->sonnum >> nowfile->linenum;
+        is >> nowfile->checksum >> nowfile->sonnum >> nowfile->linenum >>
+            nowfile->hard_link;
 
         std::ofstream os;
-        if (isDirectory(nowfile->filebuff.st_mode)) {
+        if (isDir(nowfile->filebuff.st_mode)) {
+            // dir
             if (access(nowfile->path.c_str(), F_OK) == -1) {
                 int isCreateFolder = mkdir(nowfile->path.c_str(), S_IRWXU);
                 if (isCreateFolder == -1)
                     errorhanding(FOLDER_CREATE_FOLDER);
             }
         } else {
-            os.open(nowfile->path, std::ios::out | std::ios::binary);
-            std::string s;
-            getline(is, s);
-            for (int i = 0; i < nowfile->linenum; i++) {
-                getline(is, s);
-                os << s << std::endl;
+            if (isFIFO(nowfile->filebuff.st_mode)) {
+                // pipe
+                mkfifo(nowfile->path.c_str(), nowfile->filebuff.st_mode);
+            } else {
+                if (isLink(nowfile->filebuff.st_mode)) {
+                    // soft-link
+                    std::string s;
+                    getline(is, s); // input empty line
+                    getline(is, s);
+                    sy_link.push_back(std::make_pair(s, nowfile));
+                    continue;
+                } else {
+                    if (nowfile->hard_link) {
+                        std::string s;
+                        getline(is, s);
+                        getline(is, s);
+                        if (link(s.c_str(), nowfile->path.c_str()) == -1)
+                            errorhanding(HARD_LINK_CREATE_FAIL);
+                    } else {
+                        // file
+                        os.open(nowfile->path,
+                                std::ios::out | std::ios::binary);
+                        std::string s;
+                        getline(is, s);
+                        for (int i = 0; i < nowfile->linenum; i++) {
+                            getline(is, s);
+                            os << s << std::endl;
+                        }
+                        os.close();
+                    }
+                }
             }
-            os.close();
         }
         // update the Attributes of file or dir
-        struct utimbuf timebuf;
-        timebuf.actime = nowfile->filebuff.st_atim.tv_sec;
-        timebuf.modtime = nowfile->filebuff.st_mtim.tv_sec;
-        int change = 0;
-        change += chmod(nowfile->path.c_str(), nowfile->filebuff.st_mode);
-        change += chown(nowfile->path.c_str(), nowfile->filebuff.st_uid,
-                        nowfile->filebuff.st_gid);
-        change += utime(nowfile->path.c_str(), &timebuf);
-        if (change < 0)
-            errorhanding(UPDATE_FAIL);
-        res.push_back(nowfile);
+        changeAttr(nowfile);
+    }
+    for (auto i : sy_link) {
+        symlink(i.first.c_str(), i.second->path.c_str());
+        changeAttr(i.second);
     }
     is.close();
-    return res;
 }
