@@ -5,6 +5,15 @@
 #include "basefunction.h"
 
 int main(int argc, char *argv[]) {
+
+    std::string backup_path = getcwd(NULL, 0);
+    backup_path = backup_path + "/backup";
+    if (access(backup_path.c_str(), F_OK) == -1) { // new backup
+        int isCreateFolder = mkdir(backup_path.c_str(), S_IRWXU);
+        if (isCreateFolder == -1)
+            errorhanding(FOLDER_CREATE_FOLDER);
+    }
+
     if (argc < 3)
         errorhanding(ARGC_ERROR_PATH);
     // argc[0]  the data path need to be operate
