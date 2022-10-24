@@ -1,16 +1,18 @@
-#include "huffencode.h"
-#include "huffdecode.h"
+#include "huffman/huffencode.h"
+#include "huffman/huffdecode.h"
 
 using namespace huffman;
 
-void ZIP(const std::string& filename) {
-    std::string destFilename = filename + "_1";
+void ZIP(const std::string &filename) {
+    std::string destFilename = filename + ".huf";
+    std::string src = filename; //+ ".cpt";
     huffEncode he;
-    he.encode(filename.data(), destFilename.data());
+    he.encode(src.data(), destFilename.data());
 }
 
-void UnZIP(const std::string& filename) {
-    std::string srcFilename = filename + "_1";
+void UnZIP(const std::string &filename) {
+    std::string srcFilename = filename + ".huf";
+    std::string dst = filename; //+ ".cpt";
     huffDecode hd;
-    hd.decode(srcFilename.data(), filename.data());
+    hd.decode(srcFilename.data(), dst.data());
 }

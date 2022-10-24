@@ -4,6 +4,7 @@
 #include <sys/time.h>
 #include <utime.h>
 #include "encrypt_and_decrypt.h"
+#include "huffman_interface.h"
 
 std::map<ino_t, std::string> hard;
 
@@ -121,21 +122,35 @@ void produce(char *path, int mode, std::string key) {
         operate_check = root->backup(aimfile);
         if (operate_check == false)
             errorhanding(BACKUP_FAIL);
-        Encrypt(aimfile, key);
+
+        std::string huf = aimfile + ".huf";
+        ZIP(aimfile.c_str()); // x -> x.huf
+        Encrypt(huf, key);    // x.huf -> x.huf.cpt
+        unlink(huf.c_str());
         unlink(aimfile.c_str());
 
     } else if (mode == RECOVER) {
         deletefile(path);
-        Decrypt(aimfile, key);
+
+        std::string huf = aimfile + ".huf";
+        Decrypt(huf, key);      // x.huf.cpt -> x.huf
+        UnZIP(aimfile.c_str()); // x.huf -> x
+
         operate_check = recover(aimfile);
         if (operate_check == false)
             errorhanding(RECOVER_FAIL);
+
         unlink(aimfile.c_str());
+        unlink(huf.c_str());
     }
 
     else if (mode == CHECK) {
         operate_check = true;
-        Decrypt(aimfile, key);
+
+        std::string huf = aimfile + ".huf";
+        Decrypt(huf, key);      // x.huf.cpt -> x.huf
+        UnZIP(aimfile.c_str()); // x.huf -> x
+
         filetree *root = new filetree(path);
         build(root);
         std::vector<int> p1 = getChecksumfromTree(root);
@@ -145,7 +160,9 @@ void produce(char *path, int mode, std::string key) {
             std::cout << "There is a backup problem!\n";
         else
             std::cout << "Backup succeeded!\n";
+
         unlink(aimfile.c_str());
+        unlink(huf.c_str());
 
     } else {
         // operate error
