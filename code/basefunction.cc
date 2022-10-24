@@ -5,6 +5,8 @@
 #include <utime.h>
 #include "encrypt_and_decrypt.h"
 
+std::map<ino_t, std::string> hard;
+
 int isDir(mode_t mode) { return (S_ISDIR(mode)); }
 int isFIFO(mode_t mode) { return (S_ISFIFO(mode)); }
 int isLink(mode_t mode) { return (S_ISLNK(mode)); }
@@ -15,6 +17,80 @@ int hash(char *path) {
         tot = (path[i] * basenum + tot) % modnum;
     }
     return tot;
+}
+
+bool filetree::backup(std::string name) {
+    hard.clear();
+    std::ofstream os;
+    os.open(name, std::ios::app | std::ios::binary);
+    os << totfile << std::endl;
+    os.close();
+    savadata(name);
+    return true;
+}
+void filetree::savadata(std::string name) {
+    std::string data, s;
+    if (!isDir(filebuff.st_mode) && !isFIFO(filebuff.st_mode)) {
+        if (hard.find(filebuff.st_ino) != hard.end()) {
+            // hard Links
+            linenum++;
+            hard_link = 1;
+            data = hard[filebuff.st_ino] + "\n";
+        } else {
+            // Symbolic Links
+            hard[filebuff.st_ino] = path;
+            if (isLink(filebuff.st_mode)) {
+                linenum++;
+                std::string dst = path;
+
+                char slink_path[1024];
+                memset(slink_path, 0, sizeof(slink_path));
+                int len =
+                    readlink(path.c_str(), slink_path, sizeof(slink_path));
+                if (len <= 0)
+                    errorhanding(LINK_FAIL);
+
+                int l = dst.size();
+                for (int i = l - 1; i >= 0; i--) {
+                    if (dst[i] == '/')
+                        break;
+                    dst.pop_back();
+                }
+                if (slink_path[0] != '/')
+                    dst = dst + slink_path;
+                else
+                    dst = slink_path;
+                data = dst + "\n";
+
+            } else {
+                std::ifstream is;
+                is.open(path, std::ios::binary | std::ios::in);
+                if (!is.is_open())
+                    errorhanding(FILE_OPEN_FAIL);
+                char ch;
+                while (getline(is, s))
+                    data += s + "\n", linenum++;
+                is.close();
+            }
+        }
+    }
+
+    std::ofstream os;
+    os.open(name, std::ios::app | std::ios::binary);
+    os << path << " ";
+    os << filebuff.st_mode << " " << filebuff.st_size << " " << filebuff.st_uid
+       << " ";
+    os << filebuff.st_atim.tv_sec << " " << filebuff.st_atim.tv_nsec << " "
+       << filebuff.st_mtim.tv_sec << " " << filebuff.st_mtim.tv_nsec << " "
+       << filebuff.st_ctim.tv_sec << " " << filebuff.st_ctim.tv_nsec << " "
+       << filebuff.st_uid << " " << filebuff.st_gid << " ";
+    os << checksum << " " << sonnum << " " << linenum << " " << hard_link
+       << std::endl;
+    os << data;
+    os.close();
+
+    for (auto i : son)
+        i->savadata(name);
 }
 
 void produce(char *path, int mode, std::string key) {
@@ -42,8 +118,6 @@ void produce(char *path, int mode, std::string key) {
         filetree *root = new filetree(path);
         build(root);
 
-        std::map<ino_t, std::string> hard;
-        hard.clear();
         operate_check = root->backup(aimfile);
         if (operate_check == false)
             errorhanding(BACKUP_FAIL);
@@ -51,9 +125,7 @@ void produce(char *path, int mode, std::string key) {
         unlink(aimfile.c_str());
 
     } else if (mode == RECOVER) {
-        int deletacc = deletefile(path);
-        /*if (deletacc == -1)
-            errorhanding(DELETE_FAIL);*/
+        deletefile(path);
         Decrypt(aimfile, key);
         operate_check = recover(aimfile);
         if (operate_check == false)
@@ -116,7 +188,8 @@ std::vector<int> getChecksumfromFile(std::string name) {
             nowfile->filebuff.st_ctim.tv_sec >>
             nowfile->filebuff.st_ctim.tv_nsec >> nowfile->filebuff.st_uid >>
             nowfile->filebuff.st_gid;
-        is >> nowfile->checksum >> nowfile->sonnum >> nowfile->linenum;
+        is >> nowfile->checksum >> nowfile->sonnum >> nowfile->linenum >>
+            nowfile->hard_link;
 
         if (!isDir(nowfile->filebuff.st_mode)) {
             std::string s;
@@ -322,6 +395,7 @@ void readdata(std::string name) {
                     sy_link.push_back(std::make_pair(s, nowfile));
                     continue;
                 } else {
+                    // hard link
                     if (nowfile->hard_link) {
                         std::string s;
                         getline(is, s);
