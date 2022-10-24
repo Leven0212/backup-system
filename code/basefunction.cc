@@ -94,7 +94,7 @@ void filetree::savadata(std::string name) {
         i->savadata(name);
 }
 
-void produce(char *path, int mode, std::string key) {
+void produce(char *path, int mode, std::string key, int en) {
 
     std::string pwd = getcwd(NULL, 0);
     std::string aimfolder = pwd + "/backup/";
@@ -123,33 +123,51 @@ void produce(char *path, int mode, std::string key) {
         if (operate_check == false)
             errorhanding(BACKUP_FAIL);
 
-        std::string huf = aimfile + ".huf";
-        ZIP(aimfile.c_str()); // x -> x.huf
-        Encrypt(huf, key);    // x.huf -> x.huf.cpt
-        unlink(huf.c_str());
-        unlink(aimfile.c_str());
+        if (en > 0) {
+            std::string huf = aimfile + ".huf";
+            ZIP(aimfile.c_str()); // x -> x.huf
+            if (en > 1) {
+                Encrypt(huf.c_str(), key); // x.huf -> x.huf.cpt
+                unlink(huf.c_str());
+            }
+            unlink(aimfile.c_str());
+        }
 
     } else if (mode == RECOVER) {
-        deletefile(path);
+        if (access(path, F_OK) == 0) {
+            if (deletefile(path) == -1)
+                errorhanding(DELETE_FAIL);
+        }
 
         std::string huf = aimfile + ".huf";
-        Decrypt(huf, key);      // x.huf.cpt -> x.huf
-        UnZIP(aimfile.c_str()); // x.huf -> x
+        if (en > 0) {
+            if (en > 1) {
+                Decrypt(huf, key); // x.huf.cpt -> x.huf
+            }
+            UnZIP(aimfile.c_str()); // x.huf -> x
+        }
 
         operate_check = recover(aimfile);
         if (operate_check == false)
             errorhanding(RECOVER_FAIL);
 
-        unlink(aimfile.c_str());
-        unlink(huf.c_str());
+        if (en) {
+            unlink(aimfile.c_str());
+            if (en > 1)
+                unlink(huf.c_str());
+        }
     }
 
     else if (mode == CHECK) {
         operate_check = true;
 
         std::string huf = aimfile + ".huf";
-        Decrypt(huf, key);      // x.huf.cpt -> x.huf
-        UnZIP(aimfile.c_str()); // x.huf -> x
+        if (en > 0) {
+            if (en > 1) {
+                Decrypt(huf, key); // x.huf.cpt -> x.huf
+            }
+            UnZIP(aimfile.c_str()); // x.huf -> x
+        }
 
         filetree *root = new filetree(path);
         build(root);
@@ -160,9 +178,11 @@ void produce(char *path, int mode, std::string key) {
             std::cout << "There is a backup problem!\n";
         else
             std::cout << "Backup succeeded!\n";
-
-        unlink(aimfile.c_str());
-        unlink(huf.c_str());
+        if (en) {
+            unlink(aimfile.c_str());
+            if (en > 1)
+                unlink(huf.c_str());
+        }
 
     } else {
         // operate error
@@ -235,7 +255,7 @@ int deletefile(std::string path) {
     if (lstat(path.c_str(), &st) == -1) {
         return -1;
     }
-    if (S_ISREG(st.st_mode)) {
+    if (!isDir(st.st_mode)) {
         if (unlink(path.c_str()) == -1) {
             return -1;
         }
@@ -255,16 +275,14 @@ int deletefile(std::string path) {
             errorhanding(FILE_OPEN_FAIL);
             continue;
         }
-        if (S_ISDIR(st.st_mode)) { // dir
+        if (isDir(st.st_mode)) { // dir
             if (deletefile(sub_path) == -1) {
                 closedir(dirp);
                 return -1;
             }
             rmdir(sub_path.c_str());
-        } else if (S_ISREG(st.st_mode)) { // file
+        } else { // file
             unlink(sub_path.c_str());
-        } else {
-            continue;
         }
     }
     if (rmdir(path.c_str()) == -1) // delete dir itself.
@@ -344,6 +362,8 @@ void changeAttr(filetree *nowfile) {
 
     int change = 0;
     change += chmod(nowfile->path.c_str(), nowfile->filebuff.st_mode);
+    if (change < 0)
+        errorhanding(UPDATE_FAIL);
     change += chown(nowfile->path.c_str(), nowfile->filebuff.st_uid,
                     nowfile->filebuff.st_gid);
 
@@ -438,7 +458,8 @@ void readdata(std::string name) {
         changeAttr(nowfile);
     }
     for (auto i : sy_link) {
-        symlink(i.first.c_str(), i.second->path.c_str());
+        if (symlink(i.first.c_str(), i.second->path.c_str()) == -1)
+            errorhanding(LINK_CREATE_FAIL);
         changeAttr(i.second);
     }
     is.close();

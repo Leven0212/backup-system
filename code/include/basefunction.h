@@ -31,7 +31,7 @@ int isLink(mode_t mode);
 
 int hash(char *path);     // get a hash number of the path
 int filetype(char *path); // return the type of a file
-void produce(char *path, int mode, std::string key); // operate the file
+void produce(char *path, int mode, std::string key, int en); // operate the file
 int getChecksum(const char *path, mode_t mode); // get the checksum of the file
 
 struct filetree {
