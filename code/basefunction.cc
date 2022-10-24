@@ -51,17 +51,17 @@ void filetree::savadata(std::string name) {
                 if (len <= 0)
                     errorhanding(LINK_FAIL);
 
-                int l = dst.size();
-                for (int i = l - 1; i >= 0; i--) {
-                    if (dst[i] == '/')
-                        break;
-                    dst.pop_back();
-                }
-                if (slink_path[0] != '/')
-                    dst = dst + slink_path;
-                else
-                    dst = slink_path;
-                data = dst + "\n";
+                // int l = dst.size();
+                // for (int i = l - 1; i >= 0; i--) {
+                //     if (dst[i] == '/')
+                //         break;
+                //     dst.pop_back();
+                // }
+                // if (slink_path[0] != '/')
+                //     dst = dst + slink_path;
+                // else
+                //     dst = slink_path;
+                data = data + slink_path + "\n";
 
             } else {
                 std::ifstream is;
