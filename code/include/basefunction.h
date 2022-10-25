@@ -22,8 +22,8 @@
 #define RECOVER 1
 #define CHECK 2
 
-#define KEY "0000000000000000"
-#define CEN_LEN 16
+#define KEY "00000000000000000000000000000000"
+#define CEN_LEN 32
 
 int isDir(mode_t mode);
 int isFIFO(mode_t mode);

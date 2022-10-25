@@ -3,8 +3,8 @@
 #include <stack>
 #include <sys/time.h>
 #include <utime.h>
-#include "encrypt_and_decrypt.h"
 #include "huffman_interface.h"
+#include "AES.h"
 
 std::map<ino_t, std::string> hard;
 
@@ -111,6 +111,11 @@ void produce(char *path, int mode, std::string key, int en) {
     }
     bool operate_check = true;
 
+    char *temp = const_cast<char *>(key.c_str());
+    unsigned char *keySrc = reinterpret_cast<unsigned char *>(temp);
+    aes *Crypt = new aes();
+    Crypt->setKey(keySrc, Crypt->AES_256);
+
     if (mode == BACKUP) {
         FILE *fd = fopen(aimfile.c_str(), "w+");
         if (fd == NULL)
@@ -125,9 +130,11 @@ void produce(char *path, int mode, std::string key, int en) {
 
         if (en > 0) {
             std::string huf = aimfile + ".huf";
+            std::string cpt = huf + ".cpt";
             ZIP(aimfile.c_str()); // x -> x.huf
             if (en > 1) {
-                Encrypt(huf.c_str(), key); // x.huf -> x.huf.cpt
+                Crypt->encryptFile(huf.c_str(),
+                                   cpt.c_str()); // x.huf -> x.huf.cpt
                 unlink(huf.c_str());
             }
             unlink(aimfile.c_str());
@@ -140,9 +147,11 @@ void produce(char *path, int mode, std::string key, int en) {
         }
 
         std::string huf = aimfile + ".huf";
+        std::string cpt = huf + ".cpt";
         if (en > 0) {
             if (en > 1) {
-                Decrypt(huf, key); // x.huf.cpt -> x.huf
+                Crypt->decryptFile(cpt.c_str(),
+                                   huf.c_str()); // x.huf.cpt -> x.huf
             }
             UnZIP(aimfile.c_str()); // x.huf -> x
         }
@@ -162,9 +171,11 @@ void produce(char *path, int mode, std::string key, int en) {
         operate_check = true;
 
         std::string huf = aimfile + ".huf";
+        std::string cpt = huf + ".cpt";
         if (en > 0) {
             if (en > 1) {
-                Decrypt(huf, key); // x.huf.cpt -> x.huf
+                Crypt->decryptFile(cpt.c_str(),
+                                   huf.c_str()); // x.huf.cpt -> x.huf
             }
             UnZIP(aimfile.c_str()); // x.huf -> x
         }
