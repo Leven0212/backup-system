@@ -39,5 +39,6 @@ int main(int argc, char *argv[]) {
     int more = atoi(argv[3]);
 
     produce(argv[1], operator_num, key, more);
-    return 0;
+    exit(0);
+    // return 0;
 }
