@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
             errorhanding(FOLDER_CREATE_FOLDER);
     }
 
-    if (argc < 3)
+    if (argc < 4)
         errorhanding(ARGC_ERROR_PATH);
     // argc[0]  the data path need to be operate
     // argc[1]  operate backup(0) or recover(1)

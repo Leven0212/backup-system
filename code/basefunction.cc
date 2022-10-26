@@ -406,6 +406,7 @@ void readdata(std::string name) {
     is >> tot;
 
     std::vector<std::pair<std::string, filetree *>> sy_link;
+    std::vector<filetree *> folder;
 
     for (int i = 0; i < tot; i++) {
 
@@ -430,6 +431,7 @@ void readdata(std::string name) {
                 if (isCreateFolder == -1)
                     errorhanding(FOLDER_CREATE_FOLDER);
             }
+            folder.push_back(nowfile);
         } else {
             if (isFIFO(nowfile->filebuff.st_mode)) {
                 // pipe
@@ -464,10 +466,14 @@ void readdata(std::string name) {
                     }
                 }
             }
+            // update the Attributes of file
+            changeAttr(nowfile);
         }
-        // update the Attributes of file or dir
-        changeAttr(nowfile);
     }
+    int l = folder.size();
+    for (int i = l - 1; i >= 0; i--)
+        changeAttr(folder[i]);
+
     for (auto i : sy_link) {
         if (symlink(i.first.c_str(), i.second->path.c_str()) == -1)
             errorhanding(LINK_CREATE_FAIL);

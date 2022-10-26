@@ -4,7 +4,7 @@
 #include <cerrno>
 
 void errorhanding(int errorcode) {
-    printf("%d\n", errno);
+    // printf("%d\n", errno);
     switch (errorcode) {
     case 1:
         printf("error:Command line requires more parameters.\n");
@@ -59,6 +59,6 @@ void errorhanding(int errorcode) {
         printf("Unkown error.\n");
         break;
     }
-    printf("%d\n", errorcode);
-    exit(0);
+    // printf("%d\n", errorcode);
+    exit(errorcode);
 }
