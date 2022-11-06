@@ -183,14 +183,15 @@ void produce(char *path, int mode, std::string key, int en) {
         filetree *root = new filetree(path);
         build(root);
         std::vector<std::pair<int, std::string>> p1 = getChecksumfromTree(root);
-        std::vector<int> p2 = getChecksumfromFile(aimfile);
-        std::vector<int> fail = compare(p1, p2);
+        std::vector<std::pair<int, std::string>> p2 =
+            getChecksumfromFile(aimfile);
+        std::vector<std::string> fail = compare(p1, p2);
         if (fail.size()) {
             std::string pth = pwd + "/fail.txt";
             std::ofstream os;
             os.open(pth, std::ios::binary | std::ios::out);
-            for (int i : fail)
-                os << p1[i].second << "\n";
+            for (auto i : fail)
+                os << i << "\n";
             os.close();
             errorhanding(CHECK_FAIL);
         } else
@@ -219,8 +220,8 @@ std::vector<std::pair<int, std::string>> getChecksumfromTree(filetree *root) {
     return res;
 }
 
-std::vector<int> getChecksumfromFile(std::string name) {
-    std::vector<int> res;
+std::vector<std::pair<int, std::string>> getChecksumfromFile(std::string name) {
+    std::vector<std::pair<int, std::string>> res;
     res.clear();
 
     int tot;
@@ -252,21 +253,34 @@ std::vector<int> getChecksumfromFile(std::string name) {
                 getline(is, s);
         }
 
-        res.push_back(nowfile->checksum);
+        res.push_back(std::make_pair(nowfile->checksum, nowfile->path));
     }
     is.close();
     return res;
 }
-std::vector<int> compare(std::vector<std::pair<int, std::string>> x,
-                         std::vector<int> y) {
+std::vector<std::string> compare(std::vector<std::pair<int, std::string>> x,
+                                 std::vector<std::pair<int, std::string>> y) {
 
-    std::vector<int> res;
+    std::vector<std::string> res;
     res.clear();
-    if (x.size() != y.size())
-        return res;
-    for (int i = 0; i < x.size(); i++) {
-        if (x[i].first != y[i])
-            res.push_back(i);
+
+    std::map<std::string, int> M;
+    M.clear();
+
+    for (auto i : y)
+        M[i.second] = i.first;
+
+    for (auto i : x) {
+        if (M.find(i.second) == M.end()) { // null
+            res.push_back(i.second);
+        } else {
+            if (M[i.second] != i.first)
+                res.push_back(i.second);
+            M.erase(i.second);
+        }
+    }
+    for (auto iter = M.begin(); iter != M.end(); ++iter) {
+        res.push_back(iter->first);
     }
     return res;
 }

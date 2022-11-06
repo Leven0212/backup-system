@@ -70,6 +70,6 @@ int build(filetree *node); // build the file tree and return the number of file
 int deletefile(std::string path); // remove all file
 
 std::vector<std::pair<int, std::string>> getChecksumfromTree(filetree *root);
-std::vector<int> getChecksumfromFile(std::string name);
-std::vector<int> compare(std::vector<std::pair<int, std::string>> x,
-                         std::vector<int> y);
+std::vector<std::pair<int, std::string>> getChecksumfromFile(std::string name);
+std::vector<std::string> compare(std::vector<std::pair<int, std::string>> x,
+                                 std::vector<std::pair<int, std::string>> y);
