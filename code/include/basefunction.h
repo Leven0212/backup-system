@@ -69,6 +69,7 @@ void readdata(std::string name); // read data from a backup file
 int build(filetree *node); // build the file tree and return the number of file
 int deletefile(std::string path); // remove all file
 
-std::vector<int> getChecksumfromTree(filetree *root);
+std::vector<std::pair<int, std::string>> getChecksumfromTree(filetree *root);
 std::vector<int> getChecksumfromFile(std::string name);
-bool compare(std::vector<int> x, std::vector<int> y);
+std::vector<int> compare(std::vector<std::pair<int, std::string>> x,
+                         std::vector<int> y);

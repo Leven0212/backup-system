@@ -1,0 +1,3 @@
+/home/getsum/code_Linux/backup/test/1.hard
+/home/getsum/code_Linux/backup/test/pop/2.c
+/home/getsum/code_Linux/backup/test/1.txt

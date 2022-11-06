@@ -182,12 +182,18 @@ void produce(char *path, int mode, std::string key, int en) {
 
         filetree *root = new filetree(path);
         build(root);
-        std::vector<int> p1 = getChecksumfromTree(root);
+        std::vector<std::pair<int, std::string>> p1 = getChecksumfromTree(root);
         std::vector<int> p2 = getChecksumfromFile(aimfile);
-        bool legal = compare(p1, p2);
-        if (!legal)
-            std::cout << "There is a backup problem!\n";
-        else
+        std::vector<int> fail = compare(p1, p2);
+        if (fail.size()) {
+            std::string pth = pwd + "/fail.txt";
+            std::ofstream os;
+            os.open(pth, std::ios::binary | std::ios::out);
+            for (int i : fail)
+                os << p1[i].second << "\n";
+            os.close();
+            errorhanding(CHECK_FAIL);
+        } else
             std::cout << "Backup succeeded!\n";
         if (en) {
             unlink(aimfile.c_str());
@@ -201,12 +207,12 @@ void produce(char *path, int mode, std::string key, int en) {
     }
 }
 
-std::vector<int> getChecksumfromTree(filetree *root) {
-    std::vector<int> res;
+std::vector<std::pair<int, std::string>> getChecksumfromTree(filetree *root) {
+    std::vector<std::pair<int, std::string>> res;
     res.clear();
-    res.push_back(root->checksum);
+    res.push_back(std::make_pair(root->checksum, root->path));
     for (auto i : root->son) {
-        std::vector<int> temp = getChecksumfromTree(i);
+        std::vector<std::pair<int, std::string>> temp = getChecksumfromTree(i);
         for (auto j : temp)
             res.push_back(j);
     }
@@ -251,14 +257,18 @@ std::vector<int> getChecksumfromFile(std::string name) {
     is.close();
     return res;
 }
-bool compare(std::vector<int> x, std::vector<int> y) {
+std::vector<int> compare(std::vector<std::pair<int, std::string>> x,
+                         std::vector<int> y) {
+
+    std::vector<int> res;
+    res.clear();
     if (x.size() != y.size())
-        return 0;
+        return res;
     for (int i = 0; i < x.size(); i++) {
-        if (x[i] != y[i])
-            return 0;
+        if (x[i].first != y[i])
+            res.push_back(i);
     }
-    return 1;
+    return res;
 }
 
 int deletefile(std::string path) {
