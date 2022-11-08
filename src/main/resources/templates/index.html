@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<!-- META -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<!-- PAGE TITLE -->
+	<title>Home</title>
+	<!-- FAVICON -->
+	<link rel="shortcut icon" href="img/favicon.png">
+	<!-- FONTS -->
+	<link href="https://fonts.googleapis.com/css?family=Abril+Fatface%7CArapey&amp;subset=latin-ext" rel="stylesheet">
+	<!-- STYLESHEETS -->
+	<link rel="stylesheet" type="text/css" href="css/plugins.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+
+
+<body>
+	<!-- 标题信息栏 -->
+	<div style="height: 70px; border-bottom: 1px solid black; background-color: rgb(0, 81, 164);">
+        <div style="position: relative">
+            <img src="img/logo_uestc.png" alt="电子科技大学校徽" style="height: 65px; position:absolute; background: none; margin-left: 40px">
+        </div>
+        <div>
+            <p style="height: 45px; width:100%; line-height: 45px; text-align: center; font-size: 24px; font-family: KaiTi; color:rgba(217, 229, 241, 1); font-weight: bold; margin: 0 0;">电子科技大学文件备份系统</p>
+        </div>
+        <div>
+            <p style="height: 20px; width: 100%; line-height: 20px; text-align: center; font-size: 18px; font-family: KaiTi; color: grey; font-weight: normal; color:rgba(152, 185, 218, .7)">小组成员：李文，郑皓瑞，钟文宇（按姓名首字母排序）</p>
+        </div>
+    </div>
+	<!-- 标题信息栏 -->
+
+	<div class="bottom">
+		<!-- PRELOADER -->
+		<div class="preloader">
+			<div class="spinner"></div>
+		</div>
+		<!-- /PRELOADER -->
+
+		<!-- IMAGE CONTAINER -->
+		<div class="image-container">
+			<!-- <div class="background-img"></div> -->
+			<!-- CONTENT AREA INNER -->
+			<div class="content-area-inner1">
+				<!-- CONTACT -->
+				<section id="contact1">
+					<h3 class="headline scroll-animated-from-right">文件备份</h3>
+
+					<!-- CONTACT FORM -->
+					<form id="contact-form1" action="/beifen" method="post">
+						<input id="FileDir" type="text" name="FileDir"
+							class="form-control scroll-animated-from-right" placeholder="* 文件路径（绝对路径）" autocomplete="off">
+<!--						<input id="contact-form-email" type="text" name="email"-->
+<!--							class="form-control scroll-animated-from-right" placeholder="* Your Email">-->
+						<!-- PHANTOM ELEMENT ( HONEYPOT CAPTCHA FOR SECURITY ) -->
+<!--						<div class="fhp-input"><input id="contact-form-company" type="text" name="company"-->
+<!--								class="form-control"></div>-->
+						<!-- /PHANTOM ELEMENT ( HONEYPOT CAPTCHA FOR SECURITY ) -->
+<!--						<textarea id="contact-form-message" name="message" class="form-control scroll-animated-from-right"-->
+<!--							placeholder="* Your Message"></textarea>-->
+						<select class="form-controls info-select" name="method">
+							<option selected="selected" value="jichu">基础备份</option>
+							<option value="yasuo">压缩备份</option>
+							<option value="jiami">加密压缩</option>
+						</select>
+						<button type="submit" class="form-control scroll-animated-from-right">备份</button>
+<!--						<div class="success-message">* The Email was Sent Successfully!</div>-->
+					</form>
+					<!-- /CONTACT FORM -->
+				</section>
+				<!-- /CONTACT -->
+
+				<!-- FOOTER -->
+				<section id="footer">
+					<p class="scroll-animated-from-right">Copyright &copy; 2022. Group All rights reserved.</p>
+				</section>
+				<!-- /FOOTER -->
+			</div>
+		</div>
+		<!-- /IMAGE CONTAINER -->
+
+		<!-- CONTENT AREA -->
+		<div class="content-area">
+			<!-- CONTENT AREA INNER -->
+			<div class="content-area-inner2">
+
+				<!-- CONTACT -->
+				<section id="contact2">
+					<h3 class="headline scroll-animated-from-right">文件恢复</h3>
+
+					<!-- CONTACT FORM -->
+					<form id="contact-form2" action="/huifu" method="post">
+						<input id="FileDir2" type="text" name="FileDir2"
+							class="form-control scroll-animated-from-right" placeholder="* 文件路径（绝对路径）" autocomplete="off">
+<!--						<input id="contact-form-email" type="text" name="email"-->
+<!--							class="form-control scroll-animated-from-right" placeholder="* Your Email">-->
+<!--						&lt;!&ndash; PHANTOM ELEMENT ( HONEYPOT CAPTCHA FOR SECURITY ) &ndash;&gt;-->
+<!--						<div class="fhp-input"><input id="contact-form-company" type="text" name="company"-->
+<!--								class="form-control"></div>-->
+<!--						&lt;!&ndash; /PHANTOM ELEMENT ( HONEYPOT CAPTCHA FOR SECURITY ) &ndash;&gt;-->
+<!--						<textarea id="contact-form-message" name="message" class="form-control scroll-animated-from-right"-->
+<!--							placeholder="* Your Message"></textarea>-->
+						<select class="form-controls info-select" name="leixing">
+							<option selected="selected" value="jichu2">基础恢复</option>
+							<option value="jieya">解压恢复</option>
+							<option value="jiemi">解密解压</option>
+						</select>
+						<button type="submit" class="form-control2 scroll-animated-from-right2">恢复</button>
+<!--						<div class="success-message">* The Email was Sent Successfully!</div>-->
+					</form>
+					<!-- /CONTACT FORM -->
+				</section>
+				<!-- /CONTACT -->
+
+				<!-- FOOTER -->
+				<section id="footer2">
+					<p class="scroll-animated-from-right">Copyright &copy; 2022. Group All rights reserved.</p>
+				</section>
+				<!-- /FOOTER -->
+			</div>
+			<!-- /CONTENT AREA INNER -->
+		</div>
+		<!-- /CONTENT AREA -->
+	</div>
+
+	<div class="check">
+		<form id="contact-form1" action="/check" method="post">
+			<input id="tarFile" type="text" name="tarFile"
+				class="form-control scroll-animated-from-right" placeholder="* 文件路径（绝对路径）" autocomplete="off">
+<!--						<input id="contact-form-email" type="text" name="email"-->
+<!--							class="form-control scroll-animated-from-right" placeholder="* Your Email">-->
+			<!-- PHANTOM ELEMENT ( HONEYPOT CAPTCHA FOR SECURITY ) -->
+<!--						<div class="fhp-input"><input id="contact-form-company" type="text" name="company"-->
+<!--								class="form-control"></div>-->
+			<!-- /PHANTOM ELEMENT ( HONEYPOT CAPTCHA FOR SECURITY ) -->
+<!--						<textarea id="contact-form-message" name="message" class="form-control scroll-animated-from-right"-->
+<!--							placeholder="* Your Message"></textarea>-->
+			<button type="submit" class="form-control scroll-animated-from-right">检查</button>
+<!--						<div class="success-message">* The Email was Sent Successfully!</div>-->
+		</form>
+	</div>
+
+	<!-- JAVASCRIPTS -->
+	<script type="text/javascript" src="js/plugins.js"></script>
+	<script type="text/javascript" src="js/main.js"></script>
+</body>
+</html>

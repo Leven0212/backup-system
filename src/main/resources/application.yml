@@ -1,0 +1,23 @@
+server:
+  port: 9090
+
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    servlet:
+      content-type: text/html
+    mode: LEGACYHTML5
+    encoding: UTF-8
+    cache: false
+    static-path-pattern: /static/**
+    static-locations: classpath:/static/
+
+  data:
+    mongodb:
+      host: 127.0.0.1
+      port: 27017
+      database: files
+
+algorithm:
+  home: /home/ubuntu/backup-system/

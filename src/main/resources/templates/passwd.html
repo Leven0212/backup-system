@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!-- PAGE TITLE -->
+    <title>Input Passwd</title>
+    <!-- FAVICON -->
+    <link rel="shortcut icon" href="img/favicon.png">
+    <!-- FONTS -->
+    <link href="https://fonts.googleapis.com/css?family=Abril+Fatface%7CArapey&amp;subset=latin-ext" rel="stylesheet">
+    <!-- STYLESHEETS -->
+    <link rel="stylesheet" type="text/css" href="css/plugins.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<body>
+    <div class="content-area-inner1">
+        <!-- CONTACT -->
+        <section id="contact1">
+            <h3 class="headline scroll-animated-from-right">请输入密码</h3>
+
+            <!-- CONTACT FORM -->
+            <form id="contact-form1" th:action="@{'/pass?filename=' + ${filename} + '&method=' + ${method} + '&key=' +${key}}" method="post">
+                <input id="passwd" type="password" name="passwd"
+                       class="form-control scroll-animated-from-right" placeholder="* * *" autocomplete="off">
+                <!--						<input id="contact-form-email" type="text" name="email"-->
+                <!--							class="form-control scroll-animated-from-right" placeholder="* Your Email">-->
+                <!-- PHANTOM ELEMENT ( HONEYPOT CAPTCHA FOR SECURITY ) -->
+                <!--						<div class="fhp-input"><input id="contact-form-company" type="text" name="company"-->
+                <!--								class="form-control"></div>-->
+                <!-- /PHANTOM ELEMENT ( HONEYPOT CAPTCHA FOR SECURITY ) -->
+                <!--						<textarea id="contact-form-message" name="message" class="form-control scroll-animated-from-right"-->
+                <!--							placeholder="* Your Message"></textarea>-->
+                <button type="submit" class="form-control scroll-animated-from-right">提交</button>
+                <!--						<div class="success-message">* The Email was Sent Successfully!</div>-->
+            </form>
+            <!-- /CONTACT FORM -->
+        </section>
+    </div>
+</body>
+</html>
