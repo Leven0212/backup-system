@@ -152,11 +152,6 @@ void produce(char *path, int mode, std::string key, int en) {
         }
 
     } else if (mode == RECOVER) {
-        if (access(path, F_OK) == 0) {
-            if (deletefile(path) == -1)
-                errorhanding(DELETE_FAIL);
-        }
-
         std::string huf = aimfile + ".huf";
         std::string cpt = huf + ".cpt";
         if (en > 0) {
@@ -165,6 +160,10 @@ void produce(char *path, int mode, std::string key, int en) {
                                    huf.c_str()); // x.huf.cpt -> x.huf
             }
             UnZIP(aimfile.c_str()); // x.huf -> x
+        }
+        if (access(path, F_OK) == 0) {
+            if (deletefile(path) == -1)
+                errorhanding(DELETE_FAIL);
         }
 
         operate_check = recover(aimfile);
