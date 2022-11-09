@@ -69,9 +69,19 @@ void filetree::savadata(std::string name) {
                 if (!is.is_open())
                     errorhanding(FILE_OPEN_FAIL);
                 char ch;
-                while (getline(is, s))
-                    data += s + "\n", linenum++;
+                while (getline(is, s)) {
+                    data += "\n";
+                    data += s;
+                    linenum++;
+                }
+                data.erase(data.begin());
                 is.close();
+
+                FILE *fp = fopen(path.c_str(), "r");
+                fseek(fp, -1, SEEK_END);
+                ch = fgetc(fp);
+                if (ch == '\n')
+                    lastch = 1;
             }
         }
     }
@@ -85,9 +95,10 @@ void filetree::savadata(std::string name) {
        << filebuff.st_mtim.tv_sec << " " << filebuff.st_mtim.tv_nsec << " "
        << filebuff.st_ctim.tv_sec << " " << filebuff.st_ctim.tv_nsec << " "
        << filebuff.st_uid << " " << filebuff.st_gid << " ";
-    os << checksum << " " << sonnum << " " << linenum << " " << hard_link
-       << std::endl;
-    os << data;
+    os << checksum << " " << sonnum << " " << linenum << " " << hard_link << " "
+       << lastch << std::endl;
+    if (data.size())
+        os << data << std::endl;
     os.close();
 
     for (auto i : son)
@@ -244,7 +255,7 @@ std::vector<std::pair<int, std::string>> getChecksumfromFile(std::string name) {
             nowfile->filebuff.st_ctim.tv_nsec >> nowfile->filebuff.st_uid >>
             nowfile->filebuff.st_gid;
         is >> nowfile->checksum >> nowfile->sonnum >> nowfile->linenum >>
-            nowfile->hard_link;
+            nowfile->hard_link >> nowfile->lastch;
 
         if (!isDir(nowfile->filebuff.st_mode)) {
             std::string s;
@@ -445,7 +456,7 @@ void readdata(std::string name) {
             nowfile->filebuff.st_ctim.tv_nsec >> nowfile->filebuff.st_uid >>
             nowfile->filebuff.st_gid;
         is >> nowfile->checksum >> nowfile->sonnum >> nowfile->linenum >>
-            nowfile->hard_link;
+            nowfile->hard_link >> nowfile->lastch;
 
         std::ofstream os;
         if (isDir(nowfile->filebuff.st_mode)) {
@@ -484,7 +495,11 @@ void readdata(std::string name) {
                         getline(is, s);
                         for (int i = 0; i < nowfile->linenum; i++) {
                             getline(is, s);
-                            os << s << std::endl;
+                            os << s;
+                            if (i < nowfile->linenum - 1)
+                                os << std::endl;
+                            else if (nowfile->lastch)
+                                os << std::endl;
                         }
                         os.close();
                     }

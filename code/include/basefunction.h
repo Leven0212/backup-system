@@ -42,6 +42,7 @@ struct filetree {
     int sonnum;
     int totfile;
     int linenum;
+    int lastch;                  // 1 means \n
     std::vector<filetree *> son; // the sons of current node
     filetree() {
         path = "";
@@ -50,6 +51,7 @@ struct filetree {
         totfile = 0;
         linenum = 0;
         hard_link = 0;
+        lastch = 0;
     }
     filetree(std::string path_) : path(path_) {
         bool getfile = lstat(path.c_str(), &filebuff);
@@ -58,6 +60,7 @@ struct filetree {
         hard_link = 0;
         checksum = getChecksum(path.c_str(), filebuff.st_mode);
         linenum = 0;
+        lastch = 0;
     }
 
     void savadata(std::string name);
