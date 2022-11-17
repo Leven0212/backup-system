@@ -16,7 +16,7 @@ struct Node {
     Node(uchar _c, int f, Node *l = nullptr, Node *r = nullptr)
         : c(_c), freq(f), left(l), right(r) {}
     bool operator<(const Node &node)
-        const { //重载，优先队列的底层数据结构std::heap是最大堆
+        const { // 重载，优先队列的底层数据结构std::heap是最大堆
         return freq > node.freq;
     }
 };
@@ -57,23 +57,19 @@ class huffTree {
     }
 
   private:
-    struct nodeBacklog { //回溯点
+    struct nodeBacklog { // 回溯点
         Node *node;
         int next_sub_idx;
     };
     enum { LeftIndex, RightIndex };
     enum { MaxLevel = 64 };
 
-    /*
-     * 以下用于实现树形打印二叉树，手动实现栈功能，原因是std::stack无法随机访问栈空间，
-     * 而程序需要用到随机访问占空间的功能，这里用局部定义栈数组，能自动释放空间，
-     * 这里的实现对深层次理解指针和地址的关系非常有帮助，个人觉得非常巧妙，值得学习
-     */
     static void nbl_push(nodeBacklog *nbl, nodeBacklog **top,
                          nodeBacklog **bottom) {
         if (*top - *bottom < MaxLevel) {
-            (*(*top)++) = *nbl; //这里其实已经将nbl的值拷贝到*top指向的位置，不能直接*top
-                                //= nbl，否则会随nbl变化
+            (*(*top)++) =
+                *nbl; // 这里其实已经将nbl的值拷贝到*top指向的位置，不能直接*top
+                      //= nbl，否则会随nbl变化
         }
     }
     static nodeBacklog *nbl_pop(nodeBacklog **top, nodeBacklog **bottom) {
