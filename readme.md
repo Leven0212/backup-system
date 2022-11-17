@@ -146,5 +146,6 @@
 # 启动web服务，其中参数 xxx 处填写算法库根目录
 > java -jar backup-system-web-0.0.1-SNAPSHOT --algorithm.home="xxx"
 # 启动网盘服务端
-> /usr/bin/env /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java -cp /home/ubuntu/test/target/classes org.example.FileTransferServer
+> cd server
+> /usr/bin/env /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java -cp ./target/classes org.example.FileTransferServer
 ```
