@@ -638,3 +638,92 @@ a:hover {
     height: 140px;
     bottom: 0;
 }
+
+/** 10. search
+*******************************************************************/
+.search-content {
+    position: relative;
+}
+.search {
+    position: absolute;
+    right: 10px;
+    display: inline-block;
+    padding: 15px 25px;
+    height: 60px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    /*background-color: #25D0E6;*/
+    background-color: #25A6E6;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 9px #999;
+    font-family: KaiTi
+}
+
+.search:hover {background-color: #25D0E6}
+
+.search:active {
+    background-color: #3e8e41;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+}
+
+/** 11. display
+*******************************************************************/
+#display {
+    position: absolute;
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 50%;
+    left: 25%;
+}
+
+#display td, #display th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#display tr:nth-child(even){background-color: #f2f2f2;}
+
+#display tr:hover {background-color: #ddd;}
+
+#display th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #04AA6D;
+    color: white;
+}
+
+.display-content {
+    position: relative;
+}
+
+.display {
+    display: inline-block;
+    position: absolute;
+    right: 10px;
+    padding: 15px 25px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 9px #999;
+}
+  
+.display:hover {background-color: #3e8e41}
+
+.display:active {
+background-color: #3e8e41;
+box-shadow: 0 5px #666;
+transform: translateY(4px);
+}

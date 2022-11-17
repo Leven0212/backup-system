@@ -3,6 +3,9 @@ package com.backup.backupsystemweb.utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @ClassName Judge
  * @Description TODO
@@ -100,5 +103,21 @@ public class Judge {
         else if(level == 1) ans = "jieya";
         else ans = "jiemi";
         return ans;
+    }
+
+    public List<List<String>> GetAll() {
+        List<FileInfo> fileInfoList = (List<FileInfo>) dataBase.findAll();
+        List<List<String>> result = new ArrayList<>();
+        for(int i = 0; i < fileInfoList.size(); i++) {
+            FileInfo fileInfo = fileInfoList.get(i);
+            List<String> tmp = new ArrayList<>();
+            tmp.add(fileInfo.getName());
+            int level = fileInfo.getLevel();
+            if(level == 0) tmp.add("基础备份");
+            else if(level == 1) tmp.add("压缩备份");
+            else tmp.add("加密备份");
+            result.add(tmp);
+        }
+        return result;
     }
 }

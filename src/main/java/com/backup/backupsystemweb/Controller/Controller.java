@@ -4,7 +4,6 @@ import com.backup.backupsystemweb.utils.Algorithm;
 import com.backup.backupsystemweb.utils.Judge;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -12,8 +11,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
-@Controller
-public class controller {
+@org.springframework.stereotype.Controller
+public class Controller {
     @Autowired
     Judge judge;
 
@@ -185,5 +184,19 @@ public class controller {
         attr.addFlashAttribute("passwd", passwd);
         attr.addFlashAttribute("key", key);
         return "redirect:/thread";
+    }
+
+    @PostMapping("/display")
+    public String display(Model map) {
+        List<List<String>> files = judge.GetAll();
+//        List<String> name = new ArrayList<>();
+//        List<String> method = new ArrayList<>();
+//        for(int i = 0; i < files.size(); i++) {
+//            name.add(files.get(i).get(0));
+//            method.add(files.get(i).get(1));
+//        }
+        map.addAttribute("files", files);
+//        map.addAttribute("methods", method);
+        return "display";
     }
 }
