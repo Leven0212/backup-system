@@ -128,6 +128,9 @@ void produce(char *path, int mode, std::string key, int en) {
     Crypt->setKey(keySrc, Crypt->AES_256);
 
     if (mode == BACKUP) {
+        deletefile(aimfolder);
+        mkdir(aimfolder.c_str(), S_IRWXU);
+
         FILE *fd = fopen(aimfile.c_str(), "w+");
         if (fd == NULL)
             errorhanding(FOLDER_CREATE_OPEN_FILE);
@@ -304,6 +307,7 @@ int deletefile(std::string path) {
         if (unlink(path.c_str()) == -1) {
             return -1;
         }
+        return 0;
     }
 
     DIR *dirp = opendir(path.c_str());
