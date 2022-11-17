@@ -3,9 +3,6 @@ package com.backup.backupsystemweb.utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @ClassName Judge
  * @Description TODO
@@ -82,7 +79,7 @@ public class Judge {
             level = 2;
         }
         if(fileInfo == null) {
-            FileInfo fInfo = (FileInfo) dataBase.insert(file, use, passwd, level);
+            /*FileInfo fInfo = (FileInfo) */dataBase.insert(file, use, passwd, level);
             // System.out.println(fInfo.getName() + " " + fInfo.isUsepasswd() + " " + fInfo.getPasswd());
         } else {
             dataBase.update(file, use, passwd, level);

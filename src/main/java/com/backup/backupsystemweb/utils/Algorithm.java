@@ -1,16 +1,13 @@
 package com.backup.backupsystemweb.utils;
 
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.io.FileInputStream;
 
 /**
  * @ClassName Algorithm
@@ -23,6 +20,7 @@ import java.io.FileInputStream;
 public class Algorithm {
     @Value("${algorithm.home}")
     private String pathname;
+
 
     public List<String> deal(List<String> str) {
         String key = str.get(0);
@@ -71,13 +69,34 @@ public class Algorithm {
             }
 //            str.set(2, "0");
         }
+//        此处开始创建socket客户端，用于网盘传输
         String name = str.get(0);
+        try{
+            FileTransferClient client = new FileTransferClient(pathname);
+            String newName = Integer.toString(client.hash(name));
+            System.out.println(newName);
+            client.getFile(newName);
+            client.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 //        if(name.substring(name.length()-1).equals("/")) str.set(0, name.substring(0, name.length()-1));
+
         String ans = connect(str);
+        try{
+            FileTransferClient client = new FileTransferClient(pathname);
+            String newName = Integer.toString(client.hash(name));
+            System.out.println(newName);
+            client.sendFile(newName);
+            client.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         List<String> strList = new ArrayList<>();
         strList.add(ans);
         if(key.equals("check") && ans.equals("校验后发现备份存在问题")) {
-            List<String> tmp = ReadTxt();
+            List<String> tmp = readTxt();
             strList.addAll(tmp);
         }
         return strList;
@@ -96,7 +115,7 @@ public class Algorithm {
 //            System.out.println(pathname);
             pb.directory(new File(pathname));
             p = pb.start();
-            stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            stdout = new BufferedReader(new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8));
             while ((line = stdout.readLine()) != null) {
                 System.out.println(line);
             }
@@ -115,7 +134,7 @@ public class Algorithm {
      * 读取fail.txt并返回其中的错误原因
      * @return fail.txt内容
      */
-    public List<String> ReadTxt() {
+    public List<String> readTxt() {
         List<String> content = new ArrayList<>();
         content.add("存在问题的文件如下：");
         try {
@@ -130,6 +149,7 @@ public class Algorithm {
                 while((lineTxt = bufferedReader.readLine()) != null) {
                     content.add(lineTxt);
                 }
+                bufferedReader.close();
                 read.close();
             }else{
                 content.add("找不到指定的文件");
