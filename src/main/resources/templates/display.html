@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>已备份文件（夹）</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+
+<body>
+    <table id="display">
+        <tr>
+            <th>文件（夹）名</th>
+            <th>备份方式</th>
+        </tr>
+        <tr th:each="file: ${files}">
+            <td th:text="${file[0]}"></td>
+            <td th:text="${file[1]}"></td>
+        </tr>
+    </table>
+    <form class="display-content" action="/" method="get">
+        <button class="display">返回</button>
+    </form>
+</body>
+
+</html>

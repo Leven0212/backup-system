@@ -79,6 +79,7 @@
   - v2.5 添加校验功能
   - v2.6 结果自动刷新
   - v2.7 添加错误模版
+  - v2.8 添加网盘展示
 
 #### - v3 网站后端
   - v3.1 备份部分基本实现
@@ -147,5 +148,5 @@
 > java -jar backup-system-web-0.0.1-SNAPSHOT --algorithm.home="xxx"
 # 启动网盘服务端
 > cd server
-> /usr/bin/env /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java -cp ./target/classes org.example.FileTransferServer
+> java -cp ./target/classes org.example.FileTransferServer
 ```
