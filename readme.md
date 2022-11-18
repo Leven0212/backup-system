@@ -9,7 +9,6 @@ https://github.com/SunAndMoon-uestc/backup
 * g++ 9.4.0
 * OpenSSL 1.1
 * openjdk version 1.8.0_342
-* Tomcat version 9.0.65
 * Apache Maven 3.8.6
 
 ### 项目编译
