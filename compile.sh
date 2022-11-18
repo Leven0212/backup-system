@@ -20,10 +20,10 @@ if ! type openssl >/dev/null 2>&1; then
     sudo apt install openssl
 fi
 
-if ! type java >/dev/null 2>&1; then
-    echo '正在安装java'
-    sudo apt install openjdk-8-jdk
-fi
+# if ! type java >/dev/null 2>&1; then
+#     echo '正在安装java'
+#     sudo apt install openjdk-8-jdk
+# fi
 
 if ! type mvn >/dev/null 2>&1; then
     echo '正在安装maven'
@@ -49,8 +49,8 @@ make
 cd ../
 
 
-echo '生成jar包'
-rm backup-system-web-0.0.1-SNAPSHOT.jar
-mvn clean
-mvn package
-mv target/backup-system-web-0.0.1-SNAPSHOT.jar ./
+# echo '生成jar包'
+# rm backup-system-web-0.0.1-SNAPSHOT.jar
+# mvn clean
+# mvn package
+# mv target/backup-system-web-0.0.1-SNAPSHOT.jar ./
