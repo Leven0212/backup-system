@@ -15,10 +15,7 @@ https://github.com/SunAndMoon-uestc/backup
 * sh compile.sh
 
 ### 启用
-* 开启数据库服务  service mongodb start
-* 开启界面端 java -jar backup-system-web-0.0.1-SNAPSHOT --algorithm.home="xxx"
-  * 其中 "xxx" 为当前的绝对路径
-* 服务器端已经定义并开启
+* sh run.sh
 
 ### 使用
 * 使用ip addr 获取当前ip
