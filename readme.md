@@ -1,3 +1,34 @@
+# 项目总结
+
+### github
+https://github.com/SunAndMoon-uestc/backup
+
+### 编译环境
+* cmake version 3.16.3；
+* GNU Make 4.2.1
+* g++ 9.4.0
+* OpenSSL 1.1
+* openjdk version 1.8.0_342
+* Tomcat version 9.0.65
+* Apache Maven 3.8.6
+
+### 项目编译
+* sh compile.sh
+
+### 启用
+* 开启数据库服务  service mongodb start
+* 开启界面端 java -jar backup-system-web-0.0.1-SNAPSHOT --algorithm.home="xxx"
+  * 其中 "xxx" 为当前的绝对路径
+* 服务器端已经定义并开启
+
+### 使用
+* 使用ip addr 获取当前ip
+* 使用浏览器打开 ip:9090 访问界面端
+* 在界面端输入的路径必须为绝对路径
+
+
+# 项目开发记录
+
 ## 算法端
 
 ### 开发环境
